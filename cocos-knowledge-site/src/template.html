@@ -11,51 +11,149 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;800&family=Sora:wght@500;700;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Outfit:wght@500;700;800&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="./assets/styles.css" />
   </head>
   <body>
-    <div class="bg-glow glow-1"></div>
-    <div class="bg-glow glow-2"></div>
-    <header class="hero">
-      <p class="hero-kicker">Cocos Creator Web Notes</p>
-      <h1>Cocos Creator 学习知识图谱</h1>
-      <p class="hero-subtitle">
-        从教程拆解到引擎核心能力，再到 JS/TS 技术栈，一页整理用于复盘与持续更新。
-      </p>
+    <div class="bg-mesh"></div>
+    <div class="bg-orb orb-a"></div>
+    <div class="bg-orb orb-b"></div>
+    <div class="progress-track">
+      <div class="progress-bar" id="readProgress"></div>
+    </div>
+
+    <header class="hero shell">
+      <div class="hero-main">
+        <p class="hero-kicker">Cocos Atlas Notes</p>
+        <h1>Cocos Creator 学习知识地图</h1>
+        <p class="hero-subtitle">
+          教程拆解、引擎能力、JS/TS 进阶与发布流程，统一到一套可持续迭代的图谱页面。
+        </p>
+        <div class="hero-tags">
+          <span>教程合并</span>
+          <span>图文示例</span>
+          <span>Vercel 自动部署</span>
+        </div>
+      </div>
+      <div class="hero-side">
+        <div class="hero-metric">
+          <p>内容源</p>
+          <strong>Markdown</strong>
+        </div>
+        <div class="hero-metric">
+          <p>构建方式</p>
+          <strong>Static Build</strong>
+        </div>
+        <div class="hero-metric">
+          <p>更新日期</p>
+          <strong>{{BUILT_AT}}</strong>
+        </div>
+      </div>
     </header>
 
-    <main class="layout">
+    <main class="layout shell">
       <aside class="toc-panel">
-        <h2>目录</h2>
+        <h2>章节导航</h2>
+        <p class="toc-tip">点击目录可跳转，滚动时会自动高亮当前章节。</p>
         <ol>
           {{TOC_HTML}}
         </ol>
       </aside>
 
-      <article class="content-card">
-        {{ARTICLE_HTML}}
-      </article>
+      <div class="content-stage">
+        <article class="content-card">
+          {{ARTICLE_HTML}}
+        </article>
+        <section class="workflow-panel">
+          <h2>工作流快照</h2>
+          <div class="workflow-grid">
+            <div class="workflow-item">
+              <h3>1. 内容确定</h3>
+              <p>维护 <code>content/knowledge.md</code>，先保证信息结构和准确性。</p>
+            </div>
+            <div class="workflow-item">
+              <h3>2. 设计与改版</h3>
+              <p>维护 <code>src/template.html</code> 和 <code>src/styles.css</code>。</p>
+            </div>
+            <div class="workflow-item">
+              <h3>3. 构建与检查</h3>
+              <p>执行 <code>npm run build</code> 与 <code>npm run preview</code> 复核。</p>
+            </div>
+            <div class="workflow-item">
+              <h3>4. 自动上线</h3>
+              <p>推送到 GitHub 后，Vercel 会自动触发重新部署。</p>
+            </div>
+          </div>
+        </section>
+      </div>
     </main>
 
-    <section class="deploy-panel">
-      <h2>部署通道</h2>
+    <section class="deploy-panel shell">
+      <h2>部署通道与状态</h2>
       <div class="deploy-grid">
         <div class="deploy-item">
-          <h3>Vercel（免费）</h3>
-          <p>连接 Git 仓库，构建命令 `npm run build`，输出目录 `dist`。</p>
+          <h3>Vercel</h3>
+          <p>Root Directory: <code>cocos-knowledge-site</code></p>
+          <p>Build: <code>npm run build</code> · Output: <code>dist</code></p>
         </div>
         <div class="deploy-item">
-          <h3>Cloudflare Pages（免费）</h3>
-          <p>同样使用 `npm run build` + `dist`，可直接绑定自定义域名。</p>
+          <h3>Cloudflare Pages</h3>
+          <p>可作为备用通道，使用相同构建命令与输出目录。</p>
+          <p>支持免费计划与自定义域名。</p>
         </div>
       </div>
     </section>
 
-    <footer class="site-footer">
-      <p>Generated on {{BUILT_AT}} · Editable markdown source: content/knowledge.md</p>
+    <footer class="site-footer shell">
+      <p>Generated on {{BUILT_AT}} · Source: <code>content/knowledge.md</code></p>
     </footer>
+
+    <button id="backTop" class="back-top" aria-label="Back to top">Top</button>
+
+    <script>
+      const progress = document.getElementById("readProgress");
+      const backTop = document.getElementById("backTop");
+      const tocLinks = [...document.querySelectorAll(".toc-item a")];
+      const headingMap = new Map();
+
+      const updateProgress = () => {
+        const max = document.documentElement.scrollHeight - window.innerHeight;
+        const ratio = max > 0 ? (window.scrollY / max) * 100 : 0;
+        progress.style.width = ratio.toFixed(2) + "%";
+        backTop.classList.toggle("show", window.scrollY > 640);
+      };
+
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            const id = entry.target.getAttribute("id");
+            if (!id) return;
+            headingMap.set(id, entry.isIntersecting ? entry.boundingClientRect.top : Infinity);
+          });
+
+          let currentId = "";
+          let minTop = Infinity;
+          headingMap.forEach((top, id) => {
+            if (top < minTop && top > -220) {
+              minTop = top;
+              currentId = id;
+            }
+          });
+
+          tocLinks.forEach((link) => {
+            const active = link.getAttribute("href") === "#" + currentId;
+            link.classList.toggle("active", active);
+          });
+        },
+        { rootMargin: "0px 0px -68% 0px", threshold: [0, 1] }
+      );
+
+      document.querySelectorAll(".content-card h2, .content-card h3").forEach((el) => observer.observe(el));
+      window.addEventListener("scroll", updateProgress, { passive: true });
+      updateProgress();
+      backTop.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+    </script>
   </body>
 </html>
