@@ -144,6 +144,17 @@ body {
   transition: width 0.16s linear;
 }
 
+.intro-slot {
+  opacity: 0;
+  transform: translateY(14px) scale(0.99);
+}
+
+.intro-slot.intro-in {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  transition: opacity 0.52s ease, transform 0.52s cubic-bezier(0.2, 0.68, 0.25, 1);
+}
+
 .hero,
 .layout,
 .deploy-panel,
@@ -424,6 +435,51 @@ body {
   padding: 0;
 }
 
+.code-shell {
+  margin: 1rem 0;
+  border: 1px solid rgba(130, 186, 255, 0.28);
+  border-radius: 12px;
+  overflow: hidden;
+  background: #071225;
+}
+
+.code-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.42rem 0.62rem;
+  border-bottom: 1px solid rgba(119, 172, 244, 0.23);
+  background: linear-gradient(180deg, rgba(17, 35, 66, 0.95), rgba(11, 24, 46, 0.95));
+}
+
+.code-lang {
+  font-family: "Orbitron", "Noto Sans SC", sans-serif;
+  font-size: 0.73rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #89d9ff;
+}
+
+.copy-btn {
+  border: 1px solid rgba(127, 196, 255, 0.32);
+  border-radius: 8px;
+  padding: 0.2rem 0.55rem;
+  font-size: 0.75rem;
+  color: #dcf4ff;
+  background: rgba(31, 67, 123, 0.66);
+  cursor: pointer;
+}
+
+.copy-btn:hover {
+  background: rgba(45, 91, 163, 0.86);
+}
+
+.code-shell pre {
+  margin: 0;
+  border: none;
+  border-radius: 0;
+}
+
 .content-card table {
   width: 100%;
   border-collapse: collapse;
@@ -535,6 +591,125 @@ body {
   padding: 0.08em 0.35em;
 }
 
+.mini-map {
+  position: fixed;
+  right: 20px;
+  bottom: 86px;
+  width: 74px;
+  border: 1px solid rgba(122, 192, 255, 0.38);
+  border-radius: 14px;
+  background: rgba(8, 20, 42, 0.85);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.35);
+  padding: 9px 8px 10px;
+  z-index: 28;
+  --map-progress: 0%;
+}
+
+.mini-head {
+  margin: 0;
+  text-align: center;
+  font-family: "Orbitron", "Noto Sans SC", sans-serif;
+  letter-spacing: 0.1em;
+  color: #9ce6ff;
+  font-size: 0.62rem;
+  text-transform: uppercase;
+}
+
+.mini-track {
+  margin-top: 8px;
+  position: relative;
+  display: grid;
+  gap: 6px;
+  justify-items: center;
+  padding: 2px 0;
+}
+
+.mini-track::before,
+.mini-track::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2px;
+  border-radius: 2px;
+}
+
+.mini-track::before {
+  top: 0;
+  bottom: 0;
+  background: rgba(101, 153, 221, 0.35);
+}
+
+.mini-track::after {
+  top: 0;
+  height: var(--map-progress);
+  background: linear-gradient(180deg, #6be7ff, #8f9eff);
+}
+
+.mini-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1px solid rgba(131, 201, 255, 0.5);
+  background: rgba(20, 49, 90, 0.9);
+  cursor: pointer;
+  z-index: 1;
+  transition: transform 0.16s ease, background-color 0.16s ease;
+}
+
+.mini-dot.active {
+  transform: scale(1.22);
+  background: #9ef3ff;
+  border-color: rgba(158, 243, 255, 0.8);
+}
+
+.perf-panel {
+  position: fixed;
+  right: 20px;
+  bottom: 194px;
+  width: 132px;
+  border: 1px solid rgba(120, 191, 255, 0.38);
+  border-radius: 14px;
+  background: rgba(8, 20, 42, 0.86);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.32);
+  padding: 9px;
+  z-index: 28;
+}
+
+.perf-head {
+  margin: 0 0 7px;
+  text-align: center;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  color: #a6defd;
+  font-family: "Orbitron", "Noto Sans SC", sans-serif;
+}
+
+.perf-buttons {
+  display: grid;
+  gap: 6px;
+}
+
+.perf-buttons button {
+  border: 1px solid rgba(130, 198, 255, 0.34);
+  border-radius: 8px;
+  font-size: 0.75rem;
+  color: #d3e8ff;
+  background: rgba(27, 58, 103, 0.58);
+  padding: 0.28rem 0.4rem;
+  cursor: pointer;
+}
+
+.perf-buttons button:hover {
+  background: rgba(46, 88, 150, 0.78);
+}
+
+.perf-buttons button.active {
+  color: #0f1d31;
+  background: linear-gradient(120deg, #7cf0ff, #a8b8ff);
+  border-color: rgba(125, 240, 255, 0.8);
+}
+
 .back-top {
   position: fixed;
   right: 20px;
@@ -616,6 +791,11 @@ body {
     width: 44px;
     height: 44px;
   }
+
+  .mini-map,
+  .perf-panel {
+    display: none;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -626,5 +806,12 @@ body {
 
   .pointer-aura {
     display: none;
+  }
+
+  .intro-slot,
+  .intro-slot.intro-in {
+    opacity: 1;
+    transform: none;
+    transition: none;
   }
 }

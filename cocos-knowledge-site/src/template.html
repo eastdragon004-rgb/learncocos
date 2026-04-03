@@ -29,7 +29,7 @@
       <div class="progress-bar" id="readProgress"></div>
     </div>
 
-    <header class="hero shell">
+    <header class="hero shell intro-slot">
       <div class="hero-main">
         <p class="hero-kicker">Cocos Knowledge StarMap</p>
         <h1>Cocos Creator 学习星图</h1>
@@ -59,7 +59,7 @@
     </header>
 
     <main class="layout shell">
-      <aside class="toc-panel">
+      <aside class="toc-panel intro-slot">
         <h2>章节导航</h2>
         <p class="toc-tip">滚动时自动高亮当前章节。</p>
         <ol>
@@ -68,10 +68,10 @@
       </aside>
 
       <div class="content-stage">
-        <article class="content-card">
+        <article class="content-card intro-slot">
           {{ARTICLE_HTML}}
         </article>
-        <section class="workflow-panel">
+        <section class="workflow-panel intro-slot">
           <h2>工作流快照</h2>
           <div class="workflow-grid">
             <div class="workflow-item">
@@ -115,6 +115,20 @@
       <p>Generated on {{BUILT_AT}} · Source: <code>content/knowledge.md</code></p>
     </footer>
 
+    <aside class="mini-map" id="miniMap" aria-label="Reading mini map">
+      <p class="mini-head">Map</p>
+      <div class="mini-track" id="miniTrack"></div>
+    </aside>
+
+    <div class="perf-panel" id="perfPanel" aria-label="Performance mode">
+      <p class="perf-head">背景模式</p>
+      <div class="perf-buttons" id="perfButtons">
+        <button type="button" data-mode="standard">标准</button>
+        <button type="button" data-mode="high">高性能</button>
+        <button type="button" data-mode="eco">省电</button>
+      </div>
+    </div>
+
     <button id="backTop" class="back-top" aria-label="Back to top">Top</button>
 
     <script>
@@ -124,12 +138,17 @@
       const headingMap = new Map();
       const aura = document.getElementById("pointerAura");
       const clickLayer = document.getElementById("clickLayer");
+      const miniMap = document.getElementById("miniMap");
+      const miniTrack = document.getElementById("miniTrack");
+      const perfButtons = [...document.querySelectorAll("#perfButtons button")];
+      const introSlots = [...document.querySelectorAll(".intro-slot")];
 
       const updateProgress = () => {
         const max = document.documentElement.scrollHeight - window.innerHeight;
         const ratio = max > 0 ? (window.scrollY / max) * 100 : 0;
         progress.style.width = ratio.toFixed(2) + "%";
         backTop.classList.toggle("show", window.scrollY > 640);
+        miniMap.style.setProperty("--map-progress", ratio.toFixed(2) + "%");
       };
 
       const observer = new IntersectionObserver(
@@ -158,6 +177,33 @@
       );
 
       const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const modeConfig = {
+        eco: { density: 16000, minStars: 70, maxStars: 150, streakChance: 0.003, maxStreaks: 1, motion: 0.56, aura: false },
+        standard: {
+          density: 9800,
+          minStars: 120,
+          maxStars: 260,
+          streakChance: 0.013,
+          maxStreaks: 4,
+          motion: 1,
+          aura: true
+        },
+        high: {
+          density: 6200,
+          minStars: 190,
+          maxStars: 420,
+          streakChance: 0.024,
+          maxStreaks: 7,
+          motion: 1.35,
+          aura: true
+        }
+      };
+
+      let perfMode = localStorage.getItem("starfield-mode") || "standard";
+      if (prefersReducedMotion) {
+        perfMode = "eco";
+      }
+
       const starCanvas = document.getElementById("starfield");
       const starCtx = starCanvas.getContext("2d");
       let stars = [];
@@ -165,10 +211,13 @@
       let starWidth = 0;
       let starHeight = 0;
       let starDpr = 1;
+      let rafId = 0;
+      const miniDots = [];
 
       const rand = (min, max) => Math.random() * (max - min) + min;
 
       const setupStars = () => {
+        const cfg = modeConfig[perfMode];
         starDpr = Math.min(window.devicePixelRatio || 1, 2);
         starWidth = window.innerWidth;
         starHeight = window.innerHeight;
@@ -178,7 +227,7 @@
         starCanvas.style.height = starHeight + "px";
         starCtx.setTransform(starDpr, 0, 0, starDpr, 0, 0);
 
-        const count = Math.min(260, Math.max(120, Math.floor((starWidth * starHeight) / 9800)));
+        const count = Math.min(cfg.maxStars, Math.max(cfg.minStars, Math.floor((starWidth * starHeight) / cfg.density)));
         stars = Array.from({ length: count }, () => ({
           x: rand(0, starWidth),
           y: rand(0, starHeight),
@@ -191,21 +240,23 @@
       };
 
       const spawnStreak = () => {
+        const cfg = modeConfig[perfMode];
         streaks.push({
           x: rand(starWidth * 0.25, starWidth * 0.9),
           y: rand(-30, starHeight * 0.35),
-          vx: rand(-4.6, -2.8),
-          vy: rand(2.2, 4.4),
+          vx: rand(-4.6, -2.8) * cfg.motion,
+          vy: rand(2.2, 4.4) * cfg.motion,
           life: rand(0.6, 1.1)
         });
       };
 
       const drawStars = () => {
+        const cfg = modeConfig[perfMode];
         starCtx.clearRect(0, 0, starWidth, starHeight);
 
         for (const s of stars) {
           s.t += 0.02 + s.s * 0.01;
-          s.y += s.s;
+          s.y += s.s * cfg.motion;
           if (s.y > starHeight + 5) {
             s.y = -5;
             s.x = rand(0, starWidth);
@@ -217,7 +268,7 @@
           starCtx.fill();
         }
 
-        if (Math.random() < 0.013 && streaks.length < 4) {
+        if (Math.random() < cfg.streakChance && streaks.length < cfg.maxStreaks) {
           spawnStreak();
         }
 
@@ -241,7 +292,7 @@
 
       const loop = () => {
         drawStars();
-        requestAnimationFrame(loop);
+        rafId = requestAnimationFrame(loop);
       };
 
       const moveAura = (x, y) => {
@@ -257,21 +308,142 @@
         wave.addEventListener("animationend", () => wave.remove(), { once: true });
       };
 
-      document.querySelectorAll(".content-card h2, .content-card h3").forEach((el) => observer.observe(el));
-      window.addEventListener("scroll", updateProgress, { passive: true });
-      backTop.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
-
-      if (!prefersReducedMotion) {
-        setupStars();
-        loop();
-      } else {
+      const applyPerfMode = (mode) => {
+        perfMode = modeConfig[mode] ? mode : "standard";
+        localStorage.setItem("starfield-mode", perfMode);
+        document.body.setAttribute("data-perf-mode", perfMode);
+        perfButtons.forEach((btn) => btn.classList.toggle("active", btn.dataset.mode === perfMode));
+        aura.style.display = modeConfig[perfMode].aura ? "" : "none";
         setupStars();
         drawStars();
+      };
+
+      const setupMiniMap = () => {
+        const headings = [...document.querySelectorAll(".content-card h2")];
+        miniTrack.innerHTML = "";
+        miniDots.length = 0;
+        headings.forEach((h, index) => {
+          if (!h.id) return;
+          const dot = document.createElement("button");
+          dot.type = "button";
+          dot.className = "mini-dot";
+          dot.title = h.textContent.trim();
+          dot.setAttribute("aria-label", h.textContent.trim());
+          dot.dataset.target = h.id;
+          dot.addEventListener("click", () => {
+            const target = document.getElementById(h.id);
+            if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+          });
+          miniTrack.appendChild(dot);
+          miniDots.push({ dot, heading: h, index });
+        });
+      };
+
+      const updateMiniMap = () => {
+        if (!miniDots.length) return;
+        let activeIndex = -1;
+        const marker = window.scrollY + 160;
+        miniDots.forEach((item, i) => {
+          if (marker >= item.heading.offsetTop) activeIndex = i;
+        });
+        miniDots.forEach((item, i) => item.dot.classList.toggle("active", i === activeIndex));
+      };
+
+      const enhanceCodeBlocks = () => {
+        const blocks = [...document.querySelectorAll(".content-card pre")];
+        blocks.forEach((pre) => {
+          if (pre.parentElement?.classList.contains("code-shell")) return;
+          const code = pre.querySelector("code");
+          const langClass = [...(code?.classList || [])].find((cls) => cls.startsWith("language-")) || "";
+          const lang = langClass.replace("language-", "") || "text";
+
+          const shell = document.createElement("div");
+          shell.className = "code-shell";
+
+          const bar = document.createElement("div");
+          bar.className = "code-bar";
+
+          const tag = document.createElement("span");
+          tag.className = "code-lang";
+          tag.textContent = lang;
+
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "copy-btn";
+          btn.textContent = "Copy";
+          btn.addEventListener("click", async () => {
+            const text = pre.innerText;
+            try {
+              await navigator.clipboard.writeText(text);
+              btn.textContent = "Copied";
+              setTimeout(() => {
+                btn.textContent = "Copy";
+              }, 1200);
+            } catch {
+              btn.textContent = "Failed";
+              setTimeout(() => {
+                btn.textContent = "Copy";
+              }, 1200);
+            }
+          });
+
+          bar.appendChild(tag);
+          bar.appendChild(btn);
+          pre.parentNode.insertBefore(shell, pre);
+          shell.appendChild(bar);
+          shell.appendChild(pre);
+        });
+      };
+
+      const runIntro = () => {
+        if (prefersReducedMotion) {
+          introSlots.forEach((el) => el.classList.add("intro-in"));
+          return;
+        }
+        const fold = window.innerHeight * 1.06;
+        let shown = 0;
+        introSlots.forEach((el) => {
+          if (el.getBoundingClientRect().top <= fold) {
+            el.style.transitionDelay = `${shown * 90}ms`;
+            shown += 1;
+          } else {
+            el.style.transitionDelay = "0ms";
+          }
+          requestAnimationFrame(() => el.classList.add("intro-in"));
+        });
+      };
+
+      document.querySelectorAll(".content-card h2, .content-card h3").forEach((el) => observer.observe(el));
+      window.addEventListener(
+        "scroll",
+        () => {
+          updateProgress();
+          updateMiniMap();
+        },
+        { passive: true }
+      );
+      backTop.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+
+      perfButtons.forEach((btn) => {
+        btn.addEventListener("click", () => applyPerfMode(btn.dataset.mode));
+      });
+
+      enhanceCodeBlocks();
+      setupMiniMap();
+      runIntro();
+      applyPerfMode(perfMode);
+
+      if (!prefersReducedMotion) {
+        loop();
       }
 
-      window.addEventListener("resize", setupStars);
+      window.addEventListener("resize", () => {
+        setupStars();
+        updateMiniMap();
+      });
       window.addEventListener("pointermove", (e) => {
         if (e.pointerType === "touch") return;
+        if (!modeConfig[perfMode].aura) return;
         aura.classList.add("active");
         moveAura(e.clientX, e.clientY);
       });
@@ -281,6 +453,7 @@
       });
       window.addEventListener("pointerleave", () => aura.classList.remove("active"));
       updateProgress();
+      updateMiniMap();
     </script>
   </body>
 </html>
