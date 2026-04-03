@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="620" viewBox="0 0 1200 620">
+  <defs>
+    <style>
+      .title { font: 700 34px 'Segoe UI', Arial, sans-serif; fill: #1f1a14; }
+      .label { font: 600 20px 'Segoe UI', Arial, sans-serif; fill: #2d261f; }
+      .small { font: 500 18px 'Segoe UI', Arial, sans-serif; fill: #5d564d; }
+      .box { fill: #fffdf9; stroke: #d9cdb9; stroke-width: 2; }
+      .axisX { stroke: #cf5d28; stroke-width: 3; marker-end: url(#ax); }
+      .axisY { stroke: #1f7668; stroke-width: 3; marker-end: url(#ay); }
+      .line { stroke: #2a68b0; stroke-width: 2.5; stroke-dasharray: 6 6; fill: none; }
+    </style>
+    <marker id="ax" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#cf5d28"/>
+    </marker>
+    <marker id="ay" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#1f7668"/>
+    </marker>
+  </defs>
+
+  <rect width="1200" height="620" fill="#f8f3ea"/>
+  <text x="40" y="58" class="title">Node Space vs World Space (Anchor + Position + Direction)</text>
+
+  <rect x="60" y="110" width="510" height="430" class="box"/>
+  <text x="80" y="145" class="label">Parent Node Space</text>
+  <line x1="140" y1="470" x2="500" y2="470" class="axisX"/>
+  <line x1="140" y1="470" x2="140" y2="170" class="axisY"/>
+  <text x="506" y="476" class="small">+X</text>
+  <text x="126" y="165" class="small">+Y</text>
+
+  <rect x="250" y="320" width="200" height="120" fill="#eaf4f2" stroke="#1f7668" stroke-width="2"/>
+  <circle cx="350" cy="380" r="6" fill="#1f7668"/>
+  <text x="360" y="386" class="small">anchor (0.5, 0.5)</text>
+
+  <line x1="350" y1="380" x2="440" y2="320" class="line"/>
+  <text x="445" y="316" class="small">local direction</text>
+
+  <rect x="650" y="110" width="510" height="430" class="box"/>
+  <text x="670" y="145" class="label">World Space</text>
+  <line x1="730" y1="470" x2="1090" y2="470" class="axisX"/>
+  <line x1="730" y1="470" x2="730" y2="170" class="axisY"/>
+  <text x="1096" y="476" class="small">+X</text>
+  <text x="716" y="165" class="small">+Y</text>
+
+  <rect x="835" y="250" width="200" height="120" fill="#fff2e9" stroke="#cf5d28" stroke-width="2"/>
+  <circle cx="935" cy="310" r="6" fill="#cf5d28"/>
+  <text x="945" y="316" class="small">world position</text>
+
+  <line x1="935" y1="310" x2="1030" y2="260" class="line"/>
+  <text x="1034" y="256" class="small">world direction</text>
+
+  <text x="60" y="585" class="small">Typical operation: UI/screen input -> convert to world point -> convert to node local point.</text>
+</svg>

@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="500" viewBox="0 0 1200 500">
+  <defs>
+    <style>
+      .title { font: 700 34px 'Segoe UI', Arial, sans-serif; fill: #1f1a14; }
+      .box { fill: #fffdf9; stroke: #d9cdb9; stroke-width: 2; rx: 15; }
+      .label { font: 600 20px 'Segoe UI', Arial, sans-serif; fill: #2d261f; }
+      .note { font: 500 17px 'Segoe UI', Arial, sans-serif; fill: #5d564d; }
+      .arrow { stroke: #1f7668; stroke-width: 4; marker-end: url(#m); fill: none; }
+    </style>
+    <marker id="m" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#1f7668"/>
+    </marker>
+  </defs>
+
+  <rect width="1200" height="500" fill="#f8f3ea"/>
+  <text x="35" y="58" class="title">Website One-Stop Workflow (Content -> Design -> Edit -> Deploy)</text>
+
+  <rect x="45" y="140" width="190" height="82" class="box"/>
+  <text x="73" y="188" class="label">Content Draft</text>
+
+  <rect x="275" y="140" width="190" height="82" class="box"/>
+  <text x="315" y="188" class="label">Template</text>
+
+  <rect x="505" y="140" width="190" height="82" class="box"/>
+  <text x="550" y="188" class="label">Build</text>
+
+  <rect x="735" y="140" width="190" height="82" class="box"/>
+  <text x="770" y="188" class="label">Review</text>
+
+  <rect x="965" y="140" width="190" height="82" class="box"/>
+  <text x="994" y="188" class="label">Deploy Vercel</text>
+
+  <path class="arrow" d="M235 181 L275 181"/>
+  <path class="arrow" d="M465 181 L505 181"/>
+  <path class="arrow" d="M695 181 L735 181"/>
+  <path class="arrow" d="M925 181 L965 181"/>
+
+  <rect x="140" y="295" width="920" height="135" class="box"/>
+  <text x="170" y="332" class="label">Installed Skills Combo</text>
+  <text x="170" y="360" class="note">frontend + website + landing-page-generator + vercel-deploy</text>
+  <text x="170" y="390" class="note">Use: content planning -> page writing -> style optimization -> production deployment.</text>
+</svg>

@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="520" viewBox="0 0 1200 520">
+  <defs>
+    <style>
+      .title { font: 700 34px 'Segoe UI', Arial, sans-serif; fill: #1f1a14; }
+      .box { fill: #fffdf9; stroke: #d9cdb9; stroke-width: 2; rx: 14; }
+      .label { font: 600 20px 'Segoe UI', Arial, sans-serif; fill: #2d261f; }
+      .note { font: 500 17px 'Segoe UI', Arial, sans-serif; fill: #5d564d; }
+      .arrow { stroke: #cf5d28; stroke-width: 4; marker-end: url(#m); fill: none; }
+    </style>
+    <marker id="m" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#cf5d28"/>
+    </marker>
+  </defs>
+
+  <rect width="1200" height="520" fill="#f8f3ea"/>
+  <text x="40" y="60" class="title">Collision + Physics + Raycast Decision Flow</text>
+
+  <rect x="80" y="150" width="180" height="84" class="box"/>
+  <text x="112" y="198" class="label">Input</text>
+  <text x="106" y="224" class="note">touch / key</text>
+
+  <rect x="320" y="150" width="220" height="84" class="box"/>
+  <text x="354" y="198" class="label">Move / Aim</text>
+  <text x="350" y="224" class="note">velocity / force</text>
+
+  <rect x="600" y="150" width="220" height="84" class="box"/>
+  <text x="652" y="198" class="label">Physics Step</text>
+  <text x="638" y="224" class="note">contact detect</text>
+
+  <rect x="880" y="150" width="220" height="84" class="box"/>
+  <text x="918" y="198" class="label">Event Callback</text>
+  <text x="932" y="224" class="note">onTrigger*</text>
+
+  <path class="arrow" d="M260 192 L320 192"/>
+  <path class="arrow" d="M540 192 L600 192"/>
+  <path class="arrow" d="M820 192 L880 192"/>
+
+  <rect x="180" y="320" width="860" height="140" class="box"/>
+  <text x="210" y="356" class="label">Merged Rules</text>
+  <text x="210" y="384" class="note">- Trigger for overlap logic (score, pickup, checkpoint).</text>
+  <text x="210" y="412" class="note">- Collision for physical response (bounce, stop, block).</text>
+  <text x="210" y="440" class="note">- Raycast for selection / line-of-sight / hit-scan checks.</text>
+</svg>

@@ -1,4 +1,4 @@
-import { mkdir, readFile, writeFile, copyFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile, copyFile, cp, rm } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import MarkdownIt from "markdown-it";
@@ -11,6 +11,8 @@ const templateFile = join(rootDir, "src", "template.html");
 const styleFile = join(rootDir, "src", "styles.css");
 const distDir = join(rootDir, "dist");
 const distAssetDir = join(distDir, "assets");
+const contentImagesDir = join(rootDir, "content", "images");
+const distImagesDir = join(distDir, "images");
 
 const md = new MarkdownIt({
   html: false,
@@ -69,8 +71,17 @@ const html = template
   .replace("{{ARTICLE_HTML}}", articleHtml)
   .replace("{{BUILT_AT}}", builtAt);
 
+await rm(distDir, { recursive: true, force: true });
 await mkdir(distAssetDir, { recursive: true });
 await writeFile(join(distDir, "index.html"), html, "utf8");
 await copyFile(styleFile, join(distAssetDir, "styles.css"));
+
+try {
+  await cp(contentImagesDir, distImagesDir, { recursive: true });
+} catch (error) {
+  if (error.code !== "ENOENT") {
+    throw error;
+  }
+}
 
 console.log(`Built site: ${join(distDir, "index.html")}`);

@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="460" viewBox="0 0 1200 460">
+  <defs>
+    <style>
+      .title { font: 700 34px 'Segoe UI', Arial, sans-serif; fill: #1f1a14; }
+      .label { font: 600 20px 'Segoe UI', Arial, sans-serif; fill: #2d261f; }
+      .note { font: 500 18px 'Segoe UI', Arial, sans-serif; fill: #5d564d; }
+      .box { fill: #fffdf9; stroke: #d9cdb9; stroke-width: 2; rx: 16; }
+      .arrow { stroke: #cf5d28; stroke-width: 4; marker-end: url(#m); fill: none; }
+    </style>
+    <marker id="m" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#cf5d28"/>
+    </marker>
+  </defs>
+
+  <rect width="1200" height="460" fill="#f8f3ea"/>
+  <text x="50" y="60" class="title">Cocos Component Lifecycle (Merged Tutorial + Official Pattern)</text>
+
+  <rect x="50" y="120" width="150" height="72" class="box"/>
+  <text x="85" y="165" class="label">onLoad</text>
+
+  <rect x="245" y="120" width="160" height="72" class="box"/>
+  <text x="280" y="165" class="label">onEnable</text>
+
+  <rect x="450" y="120" width="130" height="72" class="box"/>
+  <text x="490" y="165" class="label">start</text>
+
+  <rect x="625" y="120" width="130" height="72" class="box"/>
+  <text x="657" y="165" class="label">update</text>
+
+  <rect x="800" y="120" width="165" height="72" class="box"/>
+  <text x="827" y="165" class="label">lateUpdate</text>
+
+  <rect x="1005" y="120" width="160" height="72" class="box"/>
+  <text x="1032" y="165" class="label">onDisable</text>
+
+  <rect x="1005" y="245" width="160" height="72" class="box"/>
+  <text x="1037" y="290" class="label">onDestroy</text>
+
+  <path class="arrow" d="M200 156 L245 156"/>
+  <path class="arrow" d="M405 156 L450 156"/>
+  <path class="arrow" d="M580 156 L625 156"/>
+  <path class="arrow" d="M755 156 L800 156"/>
+  <path class="arrow" d="M965 156 L1005 156"/>
+  <path class="arrow" d="M1085 192 L1085 245"/>
+
+  <text x="50" y="380" class="note">Rule 1: Init refs / cache in onLoad, runtime state in start.</text>
+  <text x="50" y="410" class="note">Rule 2: Frame-rate independent motion must use deltaTime (dt) in update.</text>
+  <text x="50" y="440" class="note">Rule 3: Unregister events and timers in onDisable / onDestroy.</text>
+</svg>
