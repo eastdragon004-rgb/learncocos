@@ -11,43 +11,48 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700&family=Outfit:wght@500;700;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;800&family=Orbitron:wght@500;700;800&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="./assets/styles.css" />
   </head>
   <body>
-    <div class="bg-mesh"></div>
-    <div class="bg-orb orb-a"></div>
-    <div class="bg-orb orb-b"></div>
+    <canvas id="starfield" class="starfield" aria-hidden="true"></canvas>
+    <div class="noise-overlay"></div>
+    <div class="aurora aurora-a"></div>
+    <div class="aurora aurora-b"></div>
+
+    <div class="interaction-layer" id="clickLayer" aria-hidden="true"></div>
+    <div class="pointer-aura" id="pointerAura" aria-hidden="true"></div>
+
     <div class="progress-track">
       <div class="progress-bar" id="readProgress"></div>
     </div>
 
     <header class="hero shell">
       <div class="hero-main">
-        <p class="hero-kicker">Cocos Atlas Notes</p>
-        <h1>Cocos Creator 学习知识地图</h1>
+        <p class="hero-kicker">Cocos Knowledge StarMap</p>
+        <h1>Cocos Creator 学习星图</h1>
         <p class="hero-subtitle">
-          教程拆解、引擎能力、JS/TS 进阶与发布流程，统一到一套可持续迭代的图谱页面。
+          把教程、引擎机制、JS/TS 技术栈和上线流程收敛为一套可迭代的知识系统。
         </p>
         <div class="hero-tags">
-          <span>教程合并</span>
+          <span>星空交互</span>
           <span>图文示例</span>
-          <span>Vercel 自动部署</span>
+          <span>自动部署</span>
         </div>
       </div>
       <div class="hero-side">
         <div class="hero-metric">
-          <p>内容源</p>
+          <p>Source</p>
           <strong>Markdown</strong>
         </div>
         <div class="hero-metric">
-          <p>构建方式</p>
-          <strong>Static Build</strong>
+          <p>Pipeline</p>
+          <strong>Build -> Deploy</strong>
         </div>
         <div class="hero-metric">
-          <p>更新日期</p>
+          <p>Updated</p>
           <strong>{{BUILT_AT}}</strong>
         </div>
       </div>
@@ -56,7 +61,7 @@
     <main class="layout shell">
       <aside class="toc-panel">
         <h2>章节导航</h2>
-        <p class="toc-tip">点击目录可跳转，滚动时会自动高亮当前章节。</p>
+        <p class="toc-tip">滚动时自动高亮当前章节。</p>
         <ol>
           {{TOC_HTML}}
         </ol>
@@ -71,19 +76,19 @@
           <div class="workflow-grid">
             <div class="workflow-item">
               <h3>1. 内容确定</h3>
-              <p>维护 <code>content/knowledge.md</code>，先保证信息结构和准确性。</p>
+              <p>维护 <code>content/knowledge.md</code>，优先信息结构和准确性。</p>
             </div>
             <div class="workflow-item">
-              <h3>2. 设计与改版</h3>
-              <p>维护 <code>src/template.html</code> 和 <code>src/styles.css</code>。</p>
+              <h3>2. 设计迭代</h3>
+              <p>维护 <code>src/template.html</code> 与 <code>src/styles.css</code>。</p>
             </div>
             <div class="workflow-item">
-              <h3>3. 构建与检查</h3>
+              <h3>3. 构建检查</h3>
               <p>执行 <code>npm run build</code> 与 <code>npm run preview</code> 复核。</p>
             </div>
             <div class="workflow-item">
               <h3>4. 自动上线</h3>
-              <p>推送到 GitHub 后，Vercel 会自动触发重新部署。</p>
+              <p>推送到 GitHub 后，Vercel 自动触发重新部署。</p>
             </div>
           </div>
         </section>
@@ -117,6 +122,8 @@
       const backTop = document.getElementById("backTop");
       const tocLinks = [...document.querySelectorAll(".toc-item a")];
       const headingMap = new Map();
+      const aura = document.getElementById("pointerAura");
+      const clickLayer = document.getElementById("clickLayer");
 
       const updateProgress = () => {
         const max = document.documentElement.scrollHeight - window.innerHeight;
@@ -150,10 +157,130 @@
         { rootMargin: "0px 0px -68% 0px", threshold: [0, 1] }
       );
 
+      const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      const starCanvas = document.getElementById("starfield");
+      const starCtx = starCanvas.getContext("2d");
+      let stars = [];
+      let streaks = [];
+      let starWidth = 0;
+      let starHeight = 0;
+      let starDpr = 1;
+
+      const rand = (min, max) => Math.random() * (max - min) + min;
+
+      const setupStars = () => {
+        starDpr = Math.min(window.devicePixelRatio || 1, 2);
+        starWidth = window.innerWidth;
+        starHeight = window.innerHeight;
+        starCanvas.width = Math.floor(starWidth * starDpr);
+        starCanvas.height = Math.floor(starHeight * starDpr);
+        starCanvas.style.width = starWidth + "px";
+        starCanvas.style.height = starHeight + "px";
+        starCtx.setTransform(starDpr, 0, 0, starDpr, 0, 0);
+
+        const count = Math.min(260, Math.max(120, Math.floor((starWidth * starHeight) / 9800)));
+        stars = Array.from({ length: count }, () => ({
+          x: rand(0, starWidth),
+          y: rand(0, starHeight),
+          r: rand(0.4, 1.9),
+          a: rand(0.2, 0.95),
+          t: rand(0, Math.PI * 2),
+          s: rand(0.08, 0.42),
+          hue: rand(180, 230)
+        }));
+      };
+
+      const spawnStreak = () => {
+        streaks.push({
+          x: rand(starWidth * 0.25, starWidth * 0.9),
+          y: rand(-30, starHeight * 0.35),
+          vx: rand(-4.6, -2.8),
+          vy: rand(2.2, 4.4),
+          life: rand(0.6, 1.1)
+        });
+      };
+
+      const drawStars = () => {
+        starCtx.clearRect(0, 0, starWidth, starHeight);
+
+        for (const s of stars) {
+          s.t += 0.02 + s.s * 0.01;
+          s.y += s.s;
+          if (s.y > starHeight + 5) {
+            s.y = -5;
+            s.x = rand(0, starWidth);
+          }
+          const alpha = s.a + Math.sin(s.t) * 0.16;
+          starCtx.beginPath();
+          starCtx.fillStyle = `hsla(${s.hue}, 95%, 82%, ${Math.max(0.1, alpha)})`;
+          starCtx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+          starCtx.fill();
+        }
+
+        if (Math.random() < 0.013 && streaks.length < 4) {
+          spawnStreak();
+        }
+
+        streaks = streaks.filter((st) => st.life > 0);
+        for (const st of streaks) {
+          st.x += st.vx;
+          st.y += st.vy;
+          st.life -= 0.016;
+
+          starCtx.beginPath();
+          const g = starCtx.createLinearGradient(st.x, st.y, st.x - st.vx * 14, st.y - st.vy * 14);
+          g.addColorStop(0, "rgba(150, 248, 255, 0.95)");
+          g.addColorStop(1, "rgba(150, 248, 255, 0)");
+          starCtx.strokeStyle = g;
+          starCtx.lineWidth = 1.6;
+          starCtx.moveTo(st.x, st.y);
+          starCtx.lineTo(st.x - st.vx * 14, st.y - st.vy * 14);
+          starCtx.stroke();
+        }
+      };
+
+      const loop = () => {
+        drawStars();
+        requestAnimationFrame(loop);
+      };
+
+      const moveAura = (x, y) => {
+        aura.style.transform = `translate(${x}px, ${y}px)`;
+      };
+
+      const createWave = (x, y) => {
+        const wave = document.createElement("span");
+        wave.className = "click-wave";
+        wave.style.left = x + "px";
+        wave.style.top = y + "px";
+        clickLayer.appendChild(wave);
+        wave.addEventListener("animationend", () => wave.remove(), { once: true });
+      };
+
       document.querySelectorAll(".content-card h2, .content-card h3").forEach((el) => observer.observe(el));
       window.addEventListener("scroll", updateProgress, { passive: true });
-      updateProgress();
       backTop.addEventListener("click", () => window.scrollTo({ top: 0, behavior: "smooth" }));
+
+      if (!prefersReducedMotion) {
+        setupStars();
+        loop();
+      } else {
+        setupStars();
+        drawStars();
+      }
+
+      window.addEventListener("resize", setupStars);
+      window.addEventListener("pointermove", (e) => {
+        if (e.pointerType === "touch") return;
+        aura.classList.add("active");
+        moveAura(e.clientX, e.clientY);
+      });
+      window.addEventListener("pointerdown", (e) => {
+        if (e.pointerType === "touch") return;
+        createWave(e.clientX, e.clientY);
+      });
+      window.addEventListener("pointerleave", () => aura.classList.remove("active"));
+      updateProgress();
     </script>
   </body>
 </html>

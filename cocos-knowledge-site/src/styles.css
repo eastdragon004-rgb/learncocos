@@ -1,14 +1,16 @@
 :root {
-  --ink: #1f2630;
-  --muted: #5f6c7f;
-  --paper: #f8f5ef;
-  --paper-2: #fdfbf7;
-  --line: #d2c6b4;
-  --accent: #f05f3b;
-  --accent-2: #058a9a;
-  --accent-3: #0c3f67;
-  --shadow-lg: 0 18px 42px rgba(19, 30, 45, 0.13);
-  --shadow-md: 0 10px 26px rgba(21, 30, 44, 0.11);
+  --bg: #060913;
+  --panel: rgba(11, 18, 36, 0.76);
+  --panel-2: rgba(14, 24, 48, 0.82);
+  --line: rgba(114, 184, 255, 0.22);
+  --text: #dce9ff;
+  --muted: #91a6c6;
+  --title: #f6fbff;
+  --cyan: #43d5ff;
+  --blue: #3f78ff;
+  --pink: #ff5fb7;
+  --shadow-lg: 0 22px 60px rgba(0, 0, 0, 0.45);
+  --shadow-md: 0 14px 34px rgba(0, 0, 0, 0.35);
 }
 
 *,
@@ -28,15 +30,13 @@ html {
 }
 
 body {
-  color: var(--ink);
-  background:
-    radial-gradient(circle at 9% 14%, rgba(240, 95, 59, 0.16), transparent 44%),
-    radial-gradient(circle at 93% 16%, rgba(5, 138, 154, 0.14), transparent 40%),
-    linear-gradient(165deg, #ece7de 0%, #f4efe6 32%, #ede8df 100%);
-  font-family: "Noto Serif SC", "Source Han Serif SC", "Songti SC", serif;
-  line-height: 1.82;
+  color: var(--text);
+  background: var(--bg);
+  font-family: "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  line-height: 1.78;
   min-height: 100vh;
   padding: 26px clamp(12px, 2vw, 30px) 44px;
+  overflow-x: hidden;
 }
 
 .shell {
@@ -45,40 +45,85 @@ body {
   margin-right: auto;
 }
 
-.bg-mesh {
+.starfield,
+.noise-overlay,
+.aurora,
+.interaction-layer {
   position: fixed;
   inset: 0;
-  background:
-    linear-gradient(rgba(255, 255, 255, 0.14) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.14) 1px, transparent 1px);
-  background-size: 36px 36px;
-  opacity: 0.22;
   pointer-events: none;
+}
+
+.starfield {
   z-index: 0;
 }
 
-.bg-orb {
+.noise-overlay {
+  z-index: 1;
+  opacity: 0.07;
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.8) 0.7px, transparent 0.7px);
+  background-size: 3px 3px;
+}
+
+.aurora {
+  z-index: 1;
+  filter: blur(42px);
+}
+
+.aurora-a {
+  background: radial-gradient(circle at 20% 20%, rgba(67, 213, 255, 0.2), transparent 38%);
+}
+
+.aurora-b {
+  background: radial-gradient(circle at 84% 26%, rgba(255, 95, 183, 0.17), transparent 34%);
+}
+
+.interaction-layer {
+  z-index: 40;
+}
+
+.pointer-aura {
+  width: 230px;
+  height: 230px;
+  margin-left: -115px;
+  margin-top: -115px;
   position: fixed;
-  border-radius: 999px;
-  filter: blur(6px);
-  z-index: 0;
+  left: 0;
+  top: 0;
+  border-radius: 50%;
   pointer-events: none;
+  z-index: 35;
+  opacity: 0;
+  transform: translate(-9999px, -9999px);
+  background: radial-gradient(circle, rgba(67, 213, 255, 0.2) 0%, rgba(67, 213, 255, 0.04) 46%, transparent 70%);
+  transition: opacity 0.2s ease;
 }
 
-.orb-a {
-  width: 420px;
-  height: 420px;
-  right: -140px;
-  top: -110px;
-  background: radial-gradient(circle, rgba(240, 95, 59, 0.34), transparent 66%);
+.pointer-aura.active {
+  opacity: 1;
 }
 
-.orb-b {
-  width: 460px;
-  height: 460px;
-  left: -160px;
-  bottom: -160px;
-  background: radial-gradient(circle, rgba(5, 138, 154, 0.33), transparent 68%);
+.click-wave {
+  position: fixed;
+  width: 16px;
+  height: 16px;
+  margin-left: -8px;
+  margin-top: -8px;
+  border-radius: 50%;
+  border: 1px solid rgba(126, 219, 255, 0.75);
+  box-shadow: 0 0 24px rgba(94, 211, 255, 0.65);
+  animation: wave 0.68s ease-out forwards;
+}
+
+@keyframes wave {
+  from {
+    transform: scale(0.2);
+    opacity: 1;
+  }
+  to {
+    transform: scale(11.8);
+    opacity: 0;
+  }
 }
 
 .progress-track {
@@ -87,15 +132,15 @@ body {
   left: 0;
   right: 0;
   height: 4px;
-  background: rgba(16, 22, 31, 0.08);
   z-index: 50;
+  background: rgba(7, 12, 26, 0.48);
 }
 
 .progress-bar {
   width: 0;
   height: 100%;
-  background: linear-gradient(90deg, var(--accent), var(--accent-2));
-  box-shadow: 0 2px 10px rgba(240, 95, 59, 0.42);
+  background: linear-gradient(90deg, var(--cyan), var(--blue), var(--pink));
+  box-shadow: 0 0 16px rgba(67, 213, 255, 0.72);
   transition: width 0.16s linear;
 }
 
@@ -104,57 +149,50 @@ body {
 .deploy-panel,
 .site-footer {
   position: relative;
-  z-index: 1;
+  z-index: 10;
 }
 
 .hero {
-  margin-bottom: 22px;
-  border: 1px solid rgba(12, 63, 103, 0.25);
+  margin-bottom: 20px;
+  border: 1px solid var(--line);
   border-radius: 24px;
-  box-shadow: var(--shadow-lg);
   overflow: hidden;
+  box-shadow: var(--shadow-lg);
   display: grid;
   grid-template-columns: minmax(0, 1fr) 300px;
   background:
-    linear-gradient(125deg, #fff8ee 0%, #f6efe3 46%, #e8f4f5 100%);
+    linear-gradient(145deg, rgba(10, 22, 47, 0.88), rgba(16, 30, 58, 0.78)),
+    radial-gradient(circle at 8% 6%, rgba(67, 213, 255, 0.17), transparent 36%);
+  backdrop-filter: blur(8px);
 }
 
 .hero-main {
-  padding: 28px 30px 26px;
-}
-
-.hero-side {
-  background: linear-gradient(165deg, rgba(12, 63, 103, 0.95), rgba(5, 138, 154, 0.94));
-  color: #edf5fb;
-  padding: 22px 18px;
-  display: grid;
-  align-content: center;
-  gap: 12px;
+  padding: 28px 30px 24px;
 }
 
 .hero-kicker {
   display: inline-block;
   margin: 0 0 8px;
-  font-family: "Outfit", "Noto Sans SC", sans-serif;
+  font-family: "Orbitron", "Noto Sans SC", sans-serif;
   font-size: 0.76rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.11em;
   text-transform: uppercase;
-  color: #155f87;
+  color: #7de6ff;
 }
 
 .hero h1 {
   margin: 0;
-  font-family: "Outfit", "Noto Sans SC", sans-serif;
-  font-size: clamp(1.78rem, 3vw, 2.9rem);
-  line-height: 1.18;
-  letter-spacing: 0.01em;
+  color: var(--title);
+  font-family: "Orbitron", "Noto Sans SC", sans-serif;
+  font-size: clamp(1.7rem, 2.9vw, 2.75rem);
+  line-height: 1.16;
+  text-shadow: 0 0 22px rgba(67, 213, 255, 0.16);
 }
 
 .hero-subtitle {
-  margin: 12px 0 16px;
-  max-width: 70ch;
-  color: #415165;
+  margin: 12px 0 15px;
+  max-width: 74ch;
+  color: #b8ccef;
 }
 
 .hero-tags {
@@ -164,36 +202,46 @@ body {
 }
 
 .hero-tags span {
+  font-size: 0.83rem;
+  color: #bdefff;
+  border: 1px solid rgba(67, 213, 255, 0.3);
+  background: rgba(18, 40, 76, 0.6);
   border-radius: 999px;
-  border: 1px solid rgba(5, 138, 154, 0.3);
-  background: rgba(255, 255, 255, 0.76);
-  color: #124d65;
-  font-family: "Outfit", "Noto Sans SC", sans-serif;
-  font-size: 0.84rem;
   padding: 5px 12px;
 }
 
+.hero-side {
+  padding: 20px 16px;
+  display: grid;
+  align-content: center;
+  gap: 10px;
+  background:
+    linear-gradient(160deg, rgba(14, 37, 71, 0.84), rgba(16, 26, 57, 0.9)),
+    radial-gradient(circle at 78% 10%, rgba(255, 95, 183, 0.2), transparent 42%);
+  border-left: 1px solid rgba(137, 191, 255, 0.25);
+}
+
 .hero-metric {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.24);
+  border: 1px solid rgba(145, 206, 255, 0.3);
   border-radius: 12px;
-  padding: 10px 12px;
+  background: rgba(8, 25, 48, 0.6);
+  padding: 9px 11px;
 }
 
 .hero-metric p {
   margin: 0;
-  opacity: 0.85;
-  font-size: 0.78rem;
-  letter-spacing: 0.08em;
+  font-family: "Orbitron", "Noto Sans SC", sans-serif;
+  font-size: 0.72rem;
+  color: #93d8ff;
+  letter-spacing: 0.11em;
   text-transform: uppercase;
-  font-family: "Outfit", "Noto Sans SC", sans-serif;
 }
 
 .hero-metric strong {
   display: block;
   margin-top: 3px;
-  font-size: 1.03rem;
-  font-family: "Outfit", "Noto Sans SC", sans-serif;
+  font-size: 0.99rem;
+  color: #e7f5ff;
 }
 
 .layout {
@@ -210,7 +258,7 @@ body {
   border: 1px solid var(--line);
   border-radius: 18px;
   box-shadow: var(--shadow-md);
-  background: var(--paper-2);
+  backdrop-filter: blur(7px);
 }
 
 .toc-panel {
@@ -218,13 +266,14 @@ body {
   top: 18px;
   padding: 16px 14px 12px;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(249, 244, 235, 0.96));
+    linear-gradient(170deg, rgba(8, 20, 43, 0.84), rgba(11, 24, 49, 0.77));
 }
 
 .toc-panel h2 {
   margin: 0;
-  font-family: "Outfit", "Noto Sans SC", sans-serif;
-  font-size: 1.08rem;
+  font-family: "Orbitron", "Noto Sans SC", sans-serif;
+  font-size: 1.03rem;
+  color: #deefff;
 }
 
 .toc-tip {
@@ -235,41 +284,41 @@ body {
 
 .toc-panel ol {
   margin: 0;
-  padding-left: 0;
+  padding: 0;
   list-style: none;
   max-height: calc(100vh - 190px);
   overflow: auto;
 }
 
 .toc-item {
-  margin: 0.34rem 0;
+  margin: 0.3rem 0;
 }
 
 .toc-item a {
   display: block;
-  color: #38506c;
-  text-decoration: none;
   border-radius: 10px;
-  padding: 0.34rem 0.55rem;
   border: 1px solid transparent;
-  transition: all 0.16s ease;
+  color: #b9cff0;
+  text-decoration: none;
+  padding: 0.35rem 0.5rem;
   font-size: 0.9rem;
+  transition: all 0.16s ease;
 }
 
 .toc-item a:hover {
-  border-color: rgba(12, 63, 103, 0.2);
-  background: rgba(12, 63, 103, 0.07);
+  border-color: rgba(126, 219, 255, 0.3);
+  background: rgba(47, 97, 165, 0.2);
 }
 
 .toc-item a.active {
-  color: #fff;
-  border-color: rgba(240, 95, 59, 0.45);
-  background: linear-gradient(120deg, #e05938, #0a7488);
+  color: #08101c;
+  border-color: rgba(126, 219, 255, 0.5);
+  background: linear-gradient(120deg, #7cf0ff, #b8d4ff);
 }
 
 .toc-lv-3 a {
   margin-left: 10px;
-  font-size: 0.86rem;
+  font-size: 0.85rem;
 }
 
 .content-stage {
@@ -280,7 +329,7 @@ body {
 .content-card {
   padding: clamp(18px, 2.2vw, 32px);
   background:
-    linear-gradient(180deg, #fffdf8 0%, #f8f4ec 100%);
+    linear-gradient(170deg, rgba(9, 18, 38, 0.86), rgba(12, 22, 46, 0.78));
 }
 
 .content-card h1,
@@ -291,52 +340,50 @@ body {
 
 .content-card h1 {
   margin-top: 0;
-  font-family: "Outfit", "Noto Sans SC", sans-serif;
-  font-size: clamp(1.58rem, 2.2vw, 2.2rem);
+  color: #eff8ff;
+  font-family: "Orbitron", "Noto Sans SC", sans-serif;
+  font-size: clamp(1.5rem, 2.1vw, 2.18rem);
 }
 
 .content-card h2 {
-  margin-top: 1.9em;
-  margin-bottom: 0.6em;
-  font-family: "Outfit", "Noto Sans SC", sans-serif;
-  font-size: 1.36rem;
-  border-left: 6px solid var(--accent-2);
+  margin-top: 1.8em;
+  margin-bottom: 0.52em;
+  color: #dff5ff;
+  font-family: "Orbitron", "Noto Sans SC", sans-serif;
+  font-size: 1.28rem;
+  border-left: 5px solid #6be4ff;
   padding-left: 10px;
 }
 
 .content-card h3 {
-  margin-top: 1.45em;
-  margin-bottom: 0.38em;
-  font-family: "Outfit", "Noto Sans SC", sans-serif;
-  font-size: 1.1rem;
-  color: #143d65;
+  margin-top: 1.38em;
+  margin-bottom: 0.33em;
+  color: #9ee7ff;
+  font-size: 1.08rem;
+  font-family: "Orbitron", "Noto Sans SC", sans-serif;
 }
 
 .content-card p,
 .content-card li {
-  color: #2a3444;
-}
-
-.content-card p + p {
-  margin-top: 0.72em;
+  color: #c4d5f0;
 }
 
 .content-card a {
-  color: #0c6b97;
+  color: #87ecff;
   text-decoration: none;
-  border-bottom: 1px dashed rgba(12, 107, 151, 0.5);
+  border-bottom: 1px dotted rgba(135, 236, 255, 0.48);
 }
 
 .content-card a:hover {
-  color: #034d74;
+  color: #d8f8ff;
 }
 
 .content-card img {
   width: 100%;
   border-radius: 14px;
-  border: 1px solid #b9c7d7;
-  box-shadow: 0 12px 28px rgba(13, 42, 72, 0.15);
-  background: #fff;
+  border: 1px solid rgba(150, 214, 255, 0.28);
+  background: rgba(4, 10, 22, 0.7);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.32);
 }
 
 .content-card ul,
@@ -345,29 +392,30 @@ body {
 }
 
 .content-card blockquote {
-  margin: 1.2rem 0;
+  margin: 1.15rem 0;
   border-radius: 12px;
-  padding: 0.85rem 1rem;
-  border: 1px solid rgba(5, 138, 154, 0.28);
-  background: linear-gradient(120deg, #ecf8f9, #f3f9ff);
-  color: #25465c;
+  border: 1px solid rgba(113, 191, 255, 0.3);
+  background: rgba(19, 47, 87, 0.45);
+  color: #c4ebff;
+  padding: 0.8rem 0.95rem;
 }
 
 .content-card code {
   border-radius: 6px;
-  padding: 0.08em 0.38em;
+  background: rgba(49, 88, 146, 0.35);
+  color: #d9f6ff;
+  padding: 0.07em 0.36em;
   font-size: 0.9em;
-  background: #efe7db;
 }
 
 .content-card pre {
   margin: 1rem 0;
   border-radius: 12px;
-  border: 1px solid #304258;
-  background: #162437;
-  color: #ebf1f7;
+  border: 1px solid rgba(130, 186, 255, 0.28);
+  background: #071225;
+  color: #d8e8ff;
   overflow: auto;
-  padding: 0.9rem 1rem;
+  padding: 0.88rem 1rem;
 }
 
 .content-card pre code {
@@ -380,67 +428,72 @@ body {
   width: 100%;
   border-collapse: collapse;
   margin: 1rem 0;
-  font-size: 0.93rem;
+  font-size: 0.92rem;
 }
 
 .content-card table th,
 .content-card table td {
-  border: 1px solid #c9baa4;
-  padding: 0.48rem 0.56rem;
+  border: 1px solid rgba(124, 182, 255, 0.26);
+  padding: 0.46rem 0.55rem;
   vertical-align: top;
 }
 
 .content-card table th {
-  background: #f0e6d6;
-  font-family: "Outfit", "Noto Sans SC", sans-serif;
+  background: rgba(29, 66, 124, 0.5);
+  color: #dff5ff;
+  font-family: "Orbitron", "Noto Sans SC", sans-serif;
 }
 
 .workflow-panel {
-  padding: 16px 18px;
-  background: linear-gradient(135deg, #fdf8f0 0%, #edf7f7 100%);
+  padding: 15px 17px;
+  background:
+    linear-gradient(145deg, rgba(11, 22, 44, 0.88), rgba(16, 28, 58, 0.83));
 }
 
 .workflow-panel h2 {
   margin: 0 0 10px;
-  font-family: "Outfit", "Noto Sans SC", sans-serif;
-  font-size: 1.24rem;
+  color: #ebf7ff;
+  font-family: "Orbitron", "Noto Sans SC", sans-serif;
+  font-size: 1.2rem;
 }
 
 .workflow-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .workflow-item {
-  border: 1px solid rgba(12, 63, 103, 0.18);
+  border: 1px solid rgba(118, 190, 255, 0.25);
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.82);
+  background: rgba(11, 28, 56, 0.58);
   padding: 10px 12px;
 }
 
 .workflow-item h3 {
   margin: 0 0 5px;
-  font-size: 0.97rem;
-  font-family: "Outfit", "Noto Sans SC", sans-serif;
+  color: #dff4ff;
+  font-size: 0.95rem;
 }
 
 .workflow-item p {
   margin: 0;
-  color: #4a5d73;
-  font-size: 0.89rem;
+  color: #a8c3e6;
+  font-size: 0.88rem;
 }
 
 .deploy-panel {
   margin-top: 18px;
   padding: 16px 18px;
-  background: linear-gradient(145deg, #f8f2e8 0%, #eef8f7 100%);
+  background:
+    linear-gradient(145deg, rgba(11, 23, 46, 0.9), rgba(18, 31, 64, 0.86));
 }
 
 .deploy-panel h2 {
   margin: 0 0 10px;
-  font-family: "Outfit", "Noto Sans SC", sans-serif;
-  font-size: 1.25rem;
+  color: #e8f7ff;
+  font-family: "Orbitron", "Noto Sans SC", sans-serif;
+  font-size: 1.2rem;
 }
 
 .deploy-grid {
@@ -450,35 +503,36 @@ body {
 }
 
 .deploy-item {
-  border: 1px solid rgba(15, 61, 100, 0.2);
+  border: 1px solid rgba(122, 192, 255, 0.24);
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.84);
-  padding: 12px 13px;
+  background: rgba(8, 23, 46, 0.58);
+  padding: 12px 12px;
 }
 
 .deploy-item h3 {
   margin: 0 0 6px;
-  font-family: "Outfit", "Noto Sans SC", sans-serif;
-  font-size: 1.02rem;
+  font-size: 1.01rem;
+  color: #dbf5ff;
+  font-family: "Orbitron", "Noto Sans SC", sans-serif;
 }
 
 .deploy-item p {
   margin: 0.2rem 0;
-  color: #4a5c73;
+  color: #a4bfdf;
 }
 
 .site-footer {
   margin-top: 14px;
+  color: #86a2c7;
   text-align: center;
-  color: #4d5f72;
   font-size: 0.9rem;
 }
 
 .site-footer code {
-  font-size: 0.88em;
   border-radius: 6px;
-  padding: 0.1em 0.34em;
-  background: #ece3d6;
+  background: rgba(44, 81, 131, 0.38);
+  color: #c9e9ff;
+  padding: 0.08em 0.35em;
 }
 
 .back-top {
@@ -487,19 +541,19 @@ body {
   bottom: 20px;
   width: 48px;
   height: 48px;
-  border: 1px solid rgba(15, 61, 100, 0.3);
   border-radius: 50%;
-  background: linear-gradient(135deg, #e55837, #0f7688);
-  color: #fff;
-  font-family: "Outfit", "Noto Sans SC", sans-serif;
+  border: 1px solid rgba(122, 192, 255, 0.5);
+  background: linear-gradient(135deg, rgba(67, 213, 255, 0.95), rgba(99, 125, 255, 0.95));
+  color: #02101e;
+  font-family: "Orbitron", "Noto Sans SC", sans-serif;
   font-weight: 700;
-  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.22);
+  box-shadow: 0 12px 26px rgba(67, 213, 255, 0.28);
   cursor: pointer;
   opacity: 0;
   transform: translateY(10px);
   pointer-events: none;
   transition: all 0.2s ease;
-  z-index: 20;
+  z-index: 30;
 }
 
 .back-top.show {
@@ -552,10 +606,25 @@ body {
     grid-template-columns: 1fr;
   }
 
+  .pointer-aura {
+    display: none;
+  }
+
   .back-top {
     right: 12px;
     bottom: 12px;
     width: 44px;
     height: 44px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .click-wave {
+    animation: none;
+    opacity: 0;
+  }
+
+  .pointer-aura {
+    display: none;
   }
 }
